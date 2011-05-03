@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,7 +15,6 @@ import android.util.Log;
 public class FRCScraper {
 
 	private static int NUMBER_OF_EVENTS = 63;
-	private int NUMBER_OF_FIELDS = 10;
 
 	private String[] eventLines = new String[NUMBER_OF_EVENTS];
 	private String[] eventFullNames = new String[NUMBER_OF_EVENTS];
@@ -25,23 +25,28 @@ public class FRCScraper {
 	private String splitRegex = "2011(.*?)\">";
 	private String eventRegex = "event/2011(.*?)\">(.*?)\\s<";
 	private String urlRegex = "event/2011(.*?)\"";
+	// private String matchRegex = ">([^<>]*?)<";
 	private String matchRegex = ">(.*?)<";
 
 	public FRCScraper(String url) {
 		// Attempt to open the webpage
+
 		try {
 			URL dataURL = new URL(url);
+
+			Log.d("", url);
 
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					dataURL.openStream()));
 
-			String line;
-			String page = "";
+			String line = "";
+			StringBuilder page = new StringBuilder();
 
 			while ((line = reader.readLine()) != null) {
-				page = page + line;
+				page.append(line);
+				Log.d("DEBUG", line);
 			}
-			data = page;
+			data = page.toString();
 			reader.close();
 
 		} catch (MalformedURLException e) {
@@ -60,13 +65,11 @@ public class FRCScraper {
 		while (eventNameMatcher.find()) {
 			eventLines[i] = eventNameMatcher.group();
 			splitEventLines[i] = eventLines[i].split(splitRegex);
-			;
 			eventFullNames[i] = splitEventLines[i][1].replace(" <", "");
 
 			i++;
 		}
 
-		// Put the event names in alphabetical order
 		// TODO: need to have this sorted array corespond with the url array
 		// Arrays.sort(eventFullNames);
 
@@ -91,28 +94,46 @@ public class FRCScraper {
 		return eventURLs;
 	}
 
-	public void getMatches() {
-		String[] rawMatchData = data.split("background-color:#FFFFFF");
-		Pattern matchPattern = Pattern.compile(matchRegex);
-		Matcher matchMatcher = matchPattern.matcher(data);
+	public String[] getMatches() {
+		String[] rawMatchData = data.split("</table>");
+		String[] matches = rawMatchData[2].split("#FFFFFF;");
 
-		int numberOfMatches = rawMatchData.length;
-		String[][] matches = new String[numberOfMatches][];
-		
+		ArrayList<String> matchList = new ArrayList<String>(
+				Arrays.asList(matches));
+		matchList.remove(0);
+		matches = matchList.toArray(new String[matchList.size()]);
+		String[] matchDetails = new String[matches.length];
+
+		for (int i = 0; i < matches.length; i++) {
+			matches[i] = findMatchData(matches[i]);
+		}
+		return matches;
+	}
+
+	private String findMatchData(String parsedMatchData) {
+		Pattern matchPattern = Pattern.compile(matchRegex);
+		Matcher matchMatcher = matchPattern.matcher(parsedMatchData);
+		String[] tableData = new String[100];
+
 		int i = 0;
-		while (matchMatcher.find()) {			
-			matches[i][0] = matchMatcher.group();
-			Log.d("DEBUG", matches[i][0]);
+		while (matchMatcher.find()) {
+			tableData[i] = matchMatcher.group();
+			tableData[i] = parseMatchCells(tableData[i]);
 			i++;
 		}
-		Log.d("DEBUG", "" + numberOfMatches);
 
-		// return matches;
+		String listViewItem = new String("Match #: " + tableData[3] + "\n" +
+				tableData[5] + " " + tableData[7] + " " + tableData[9] + " vs. " + tableData[11] + " "  +
+				tableData[13] + " " + tableData[15]);
+		return listViewItem;
 	}
 
-	private int getNumberOfTeams() {
-		int numberOfTeams = 0;
-
-		return numberOfTeams;
+	private String parseMatchCells(String retrievedCell) {
+		Log.d("", "Input: " + retrievedCell);
+		String tempString = retrievedCell.replace("<", "");
+		tempString = tempString.replace(">", "");
+		Log.d("DEBUG", "Output: " + tempString);
+		return tempString;
 	}
+
 }

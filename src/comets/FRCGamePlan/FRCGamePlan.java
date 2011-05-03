@@ -26,8 +26,7 @@ public class FRCGamePlan extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		FRCScraper eventScraper = new FRCScraper(
-				"http://www.thebluealliance.com/events");
+		FRCScraper eventScraper = new FRCScraper("http://www.thebluealliance.com/events");
 
 		// Configure UI
 		tv = (TextView) findViewById(R.id.instructionText);
