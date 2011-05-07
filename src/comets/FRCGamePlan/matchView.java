@@ -2,6 +2,8 @@ package comets.FRCGamePlan;
 
 import java.util.ArrayList;
 
+import comets.FRCGamePlan.R.layout;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -14,15 +16,40 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 
 public class matchView extends Activity {
 	private ArrayList<Path> _graphics = new ArrayList<Path>();
 	private Paint mPaint;
 
+	private float lastTouchX;
+	private float lastTouchY;
+
+	private float lastPosX;
+	private float lastPosY;
+
+	Button r1;
+	Button r2;
+	Button r3;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(new DrawingPanel(this));
+		setContentView(R.layout.match_view);
+
+		LinearLayout drawingLayout = (LinearLayout) findViewById(R.id.drawingLinearLayout);
+		drawingLayout.addView(new DrawingPanel(this));
+
+		r1 = (Button) findViewById(R.id.robot1);
+		r2 = (Button) findViewById(R.id.robot2);
+		r3 = (Button) findViewById(R.id.robot3);
+
 		mPaint = new Paint();
 		mPaint.setDither(true);
 		mPaint.setColor(0xFFFFFF00);
@@ -30,6 +57,35 @@ public class matchView extends Activity {
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 		mPaint.setStrokeWidth(3);
+
+//		r1.setOnTouchListener(new View.OnTouchListener() {
+//
+//			@Override
+//			public boolean onTouch(View v, MotionEvent me) {
+//				switch (me.getAction()) {
+//				case MotionEvent.ACTION_DOWN: {
+//					lastTouchX = me.getX();
+//					lastTouchY = me.getY();
+//					break;
+//				}
+//				case MotionEvent.ACTION_MOVE: {
+//					final float currentX = me.getX();
+//					final float currentY = me.getY();
+//					
+//					final float dx = currentX - lastTouchX;
+//					final float dy = currentY - lastTouchY;
+//					
+//					Log.d("", "X: " + me.getX() + "Y: " + me.getY());
+//					Log.d("", "Dist X: " + dx + "Dist Y: " + dy);
+//					v.setPadding((int)dx, 0, 0, 0);
+//					v.invalidate();
+//					break;
+//				}
+//				}
+//				return false;
+//			}
+//
+//		});
 
 	}
 
@@ -55,7 +111,6 @@ public class matchView extends Activity {
 					path.lineTo(event.getX(), event.getY());
 					_graphics.add(path);
 				}
-
 				return true;
 			}
 		}
@@ -70,7 +125,6 @@ public class matchView extends Activity {
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int width,
 				int height) {
-			// TODO Auto-generated method stub
 
 		}
 
@@ -124,9 +178,6 @@ public class matchView extends Activity {
 						_panel.onDraw(c);
 					}
 				} finally {
-					// do this in a finally so that if an exception is thrown
-					// during the above, we don't leave the Surface in an
-					// inconsistent state
 					if (c != null) {
 						_surfaceHolder.unlockCanvasAndPost(c);
 					}
