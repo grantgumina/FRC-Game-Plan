@@ -20,7 +20,7 @@ public class FRCScraper {
 	private String[] eventFullNames = new String[NUMBER_OF_EVENTS];
 	private String[] eventURLs = new String[NUMBER_OF_EVENTS];
 	private String[][] splitEventLines = new String[NUMBER_OF_EVENTS][NUMBER_OF_EVENTS * 2];
-
+	
 	private String data = null;
 	private String splitRegex = "2011(.*?)\">";
 	private String eventRegex = "event/2011(.*?)\">(.*?)\\s<";
@@ -34,8 +34,6 @@ public class FRCScraper {
 		try {
 			URL dataURL = new URL(url);
 
-			Log.d("", url);
-
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					dataURL.openStream()));
 
@@ -44,7 +42,6 @@ public class FRCScraper {
 
 			while ((line = reader.readLine()) != null) {
 				page.append(line);
-				Log.d("DEBUG", line);
 			}
 			data = page.toString();
 			reader.close();
@@ -94,7 +91,7 @@ public class FRCScraper {
 		return eventURLs;
 	}
 
-	public String[] getMatches() {
+	public String[][] getMatches() {
 		String[] rawMatchData = data.split("</table>");
 		String[] matches = rawMatchData[2].split("#FFFFFF;");
 
@@ -102,37 +99,34 @@ public class FRCScraper {
 				Arrays.asList(matches));
 		matchList.remove(0);
 		matches = matchList.toArray(new String[matchList.size()]);
-		String[] matchDetails = new String[matches.length];
+		String[][] matchDetails = new String[matches.length][];
 
 		for (int i = 0; i < matches.length; i++) {
-			matches[i] = findMatchData(matches[i]);
+			matchDetails[i] = findMatchData(matches[i]);
 		}
-		return matches;
+		
+		return matchDetails;
 	}
 
-	private String findMatchData(String parsedMatchData) {
+	private String[] findMatchData(String parsedMatchData) {
 		Pattern matchPattern = Pattern.compile(matchRegex);
 		Matcher matchMatcher = matchPattern.matcher(parsedMatchData);
-		String[] tableData = new String[100];
+		// the html is wonky so I need extra space for the stuff that the parser misses
+		String[] tableData = new String[25];
 
 		int i = 0;
 		while (matchMatcher.find()) {
 			tableData[i] = matchMatcher.group();
 			tableData[i] = parseMatchCells(tableData[i]);
+			Log.d("", "" + tableData[i]);
 			i++;
 		}
-
-		String listViewItem = new String("Match #: " + tableData[3] + "\n" +
-				tableData[5] + " " + tableData[7] + " " + tableData[9] + " vs. " + tableData[11] + " "  +
-				tableData[13] + " " + tableData[15]);
-		return listViewItem;
+		return tableData;
 	}
 
 	private String parseMatchCells(String retrievedCell) {
-		Log.d("", "Input: " + retrievedCell);
 		String tempString = retrievedCell.replace("<", "");
 		tempString = tempString.replace(">", "");
-		Log.d("DEBUG", "Output: " + tempString);
 		return tempString;
 	}
 

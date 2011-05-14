@@ -42,11 +42,10 @@ public class FRCGamePlan extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				// Navigate to new view and download new data based on event
-				// shortname
+				
 				String selectedItemText = eventNamesListView.getItemAtPosition(
 						arg2).toString();
-
+				
 				for (int i = 0; i < eventNames.length; i++) {
 					if (eventNames[i] == selectedItemText) {
 						Intent specificEventIntent = new Intent(FRCGamePlan.this, specificEventView.class);
@@ -57,10 +56,8 @@ public class FRCGamePlan extends Activity {
 				}
 			}
 		});
-
 		eventNamesListView.setAdapter(new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, eventNames));
-
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {

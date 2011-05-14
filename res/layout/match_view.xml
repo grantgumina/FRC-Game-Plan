@@ -4,15 +4,15 @@
     android:layout_width="fill_parent" android:layout_height="match_parent">
     <RelativeLayout android:id="@+id/relativeLayout1" android:layout_height="wrap_content" android:layout_width="match_parent">
         <LinearLayout android:layout_height="wrap_content" android:id="@+id/topAllianceButtons" android:layout_width="wrap_content" android:layout_centerHorizontal="true">
-            <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/robot1" android:text="Button" android:layout_marginRight="30dip"></Button>
-            <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/robot2" android:text="Button" android:layout_marginRight="30dip"></Button>
-            <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/robot3" android:text="Button"></Button>
+            <comets.FRCGamePlan.RobotButton android:layout_height="wrap_content" android:id="@+id/robot1" android:text="Button" android:layout_width="80dip"></comets.FRCGamePlan.RobotButton>
+            <comets.FRCGamePlan.RobotButton android:layout_height="wrap_content" android:id="@+id/robot2" android:text="Button" android:layout_width="80dip"></comets.FRCGamePlan.RobotButton>
+            <comets.FRCGamePlan.RobotButton android:layout_height="wrap_content" android:id="@+id/robot3" android:text="Button" android:layout_width="80dip"></comets.FRCGamePlan.RobotButton>
         </LinearLayout>
         <LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/drawingLinearLayout" android:layout_below="@+id/topAllianceButtons"></LinearLayout>
         <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/buttomAllianceButtons" android:layout_centerHorizontal="true" android:layout_alignParentBottom="true">
-            <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/robot4" android:text="Button" android:layout_marginRight="30dip"></Button>
-            <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/robot5" android:text="Button" android:layout_marginRight="30dip"></Button>
-            <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/robot6" android:text="Button"></Button>
+            <comets.FRCGamePlan.RobotButton android:layout_height="wrap_content" android:id="@+id/robot4" android:text="Button" android:layout_width="80dip"></comets.FRCGamePlan.RobotButton>
+            <comets.FRCGamePlan.RobotButton android:layout_height="wrap_content" android:id="@+id/robot5" android:text="Button" android:layout_width="80dip"></comets.FRCGamePlan.RobotButton>
+            <comets.FRCGamePlan.RobotButton android:layout_height="wrap_content" android:id="@+id/robot6" android:text="Button" android:layout_width="80dip"></comets.FRCGamePlan.RobotButton>
         </LinearLayout>
     </RelativeLayout>
 </LinearLayout>

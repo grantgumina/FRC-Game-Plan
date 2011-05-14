@@ -1,21 +1,32 @@
 package comets.FRCGamePlan;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import comets.FRCGamePlan.R.layout;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Display;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnCreateContextMenuListener;
+import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -23,32 +34,74 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class matchView extends Activity {
 	private ArrayList<Path> _graphics = new ArrayList<Path>();
 	private Paint mPaint;
+	String[] matchDetails;
 
-	private float lastTouchX;
-	private float lastTouchY;
-
-	private float lastPosX;
-	private float lastPosY;
-
-	Button r1;
-	Button r2;
-	Button r3;
+	RobotButton r1;
+	RobotButton r2;
+	RobotButton r3;
+	RobotButton r4;
+	RobotButton r5;
+	RobotButton r6;
+	AlertDialog.Builder builder;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.d("",
+				"\n\n----------------------------- matchView --------------------------------------");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.match_view);
 
 		LinearLayout drawingLayout = (LinearLayout) findViewById(R.id.drawingLinearLayout);
 		drawingLayout.addView(new DrawingPanel(this));
 
-		r1 = (Button) findViewById(R.id.robot1);
-		r2 = (Button) findViewById(R.id.robot2);
-		r3 = (Button) findViewById(R.id.robot3);
+		r1 = (RobotButton) findViewById(R.id.robot1);
+		r2 = (RobotButton) findViewById(R.id.robot2);
+		r3 = (RobotButton) findViewById(R.id.robot3);
+		r4 = (RobotButton) findViewById(R.id.robot4);
+		r5 = (RobotButton) findViewById(R.id.robot5);
+		r6 = (RobotButton) findViewById(R.id.robot6);
+		RobotButton[] rba = new RobotButton[] { r1, r2, r3, r4, r5, r6 };
+		
+		Bundle extras = getIntent().getExtras();
+		matchDetails = extras.getStringArray("md");
+		
+		String[] teamNumbers = new String[] { matchDetails[5], matchDetails[7],
+				matchDetails[9], matchDetails[11], matchDetails[13],
+				matchDetails[15] };
+		final String[] fTn = teamNumbers;
+
+		builder = new AlertDialog.Builder(this);
+
+		for (int i = 0; i < rba.length; i++) {
+			rba[i].setTeamNumber(teamNumbers[i]);
+			rba[i].setText(teamNumbers[i]);
+			
+			final int index = i;
+			final RobotButton frba = rba[i];
+			rba[i].setOnLongClickListener(new View.OnLongClickListener() {
+				@Override
+				public boolean onLongClick(View v) {
+					builder.setTitle("Choose a team");
+					builder.setItems(fTn,
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int item) {
+									frba.setText(fTn[item]);
+									frba.setTeamNumber(fTn[item]);
+								}
+							});
+					AlertDialog al = builder.create();
+					al.show();
+					return true;
+				}
+			});
+		}
 
 		mPaint = new Paint();
 		mPaint.setDither(true);
@@ -57,38 +110,10 @@ public class matchView extends Activity {
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPaint.setStrokeCap(Paint.Cap.ROUND);
 		mPaint.setStrokeWidth(3);
-
-//		r1.setOnTouchListener(new View.OnTouchListener() {
-//
-//			@Override
-//			public boolean onTouch(View v, MotionEvent me) {
-//				switch (me.getAction()) {
-//				case MotionEvent.ACTION_DOWN: {
-//					lastTouchX = me.getX();
-//					lastTouchY = me.getY();
-//					break;
-//				}
-//				case MotionEvent.ACTION_MOVE: {
-//					final float currentX = me.getX();
-//					final float currentY = me.getY();
-//					
-//					final float dx = currentX - lastTouchX;
-//					final float dy = currentY - lastTouchY;
-//					
-//					Log.d("", "X: " + me.getX() + "Y: " + me.getY());
-//					Log.d("", "Dist X: " + dx + "Dist Y: " + dy);
-//					v.setPadding((int)dx, 0, 0, 0);
-//					v.invalidate();
-//					break;
-//				}
-//				}
-//				return false;
-//			}
-//
-//		});
-
 	}
-
+	
+	// disclaimer - found this code online (don't worry it's open sourced - i
+	// didn't steal it)
 	class DrawingPanel extends SurfaceView implements SurfaceHolder.Callback {
 		private DrawingThread _thread;
 		private Path path;
@@ -129,13 +154,11 @@ public class matchView extends Activity {
 		}
 
 		public void surfaceCreated(SurfaceHolder holder) {
-			// TODO Auto-generated method stub
 			_thread.setRunning(true);
 			_thread.start();
 		}
 
 		public void surfaceDestroyed(SurfaceHolder holder) {
-			// TODO Auto-generated method stub
 			boolean retry = true;
 			_thread.setRunning(false);
 			while (retry) {
@@ -143,7 +166,6 @@ public class matchView extends Activity {
 					_thread.join();
 					retry = false;
 				} catch (InterruptedException e) {
-					// we will try it again and again...
 				}
 			}
 		}
