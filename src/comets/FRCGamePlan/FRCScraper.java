@@ -15,12 +15,13 @@ import android.util.Log;
 public class FRCScraper {
 
 	private static int NUMBER_OF_EVENTS = 63;
+	private static int NUMBER_OF_FIELDS = 8;
 
 	private String[] eventLines = new String[NUMBER_OF_EVENTS];
 	private String[] eventFullNames = new String[NUMBER_OF_EVENTS];
 	private String[] eventURLs = new String[NUMBER_OF_EVENTS];
 	private String[][] splitEventLines = new String[NUMBER_OF_EVENTS][NUMBER_OF_EVENTS * 2];
-	
+
 	private String data = null;
 	private String splitRegex = "2011(.*?)\">";
 	private String eventRegex = "event/2011(.*?)\">(.*?)\\s<";
@@ -102,23 +103,40 @@ public class FRCScraper {
 		String[][] matchDetails = new String[matches.length][];
 
 		for (int i = 0; i < matches.length; i++) {
-			matchDetails[i] = findMatchData(matches[i]);
+			matchDetails[i] = findData(matches[i]);
 		}
-		
+
 		return matchDetails;
 	}
 
-	private String[] findMatchData(String parsedMatchData) {
+	public String[][] getTeamStats() {
+		String[] rawRankingData = data.split("<TR style=\"background-color:#FFFFFF;\" >");
+		ArrayList<String> rawRankingList = new ArrayList<String>(Arrays.asList(rawRankingData));
+		rawRankingList.remove(0);
+		rawRankingData = rawRankingList.toArray(new String[rawRankingList.size()]);
+		
+		String[][] teamRankingDetails = new String[rawRankingData.length][];
+
+		for (int i = 0; i < rawRankingData.length; i++) {
+			teamRankingDetails[i] = findData(rawRankingData[i]);
+		}
+		
+		return teamRankingDetails;
+	}
+
+	private String[] findData(String parsedMatchData) {
 		Pattern matchPattern = Pattern.compile(matchRegex);
 		Matcher matchMatcher = matchPattern.matcher(parsedMatchData);
-		// the html is wonky so I need extra space for the stuff that the parser misses
-		String[] tableData = new String[25];
+
+		// the html is wonky so I need extra space for the stuff that the parser
+		// misses
+		// HACK ALERT!!!
+		String[] tableData = new String[200];
 
 		int i = 0;
 		while (matchMatcher.find()) {
 			tableData[i] = matchMatcher.group();
 			tableData[i] = parseMatchCells(tableData[i]);
-			Log.d("", "" + tableData[i]);
 			i++;
 		}
 		return tableData;

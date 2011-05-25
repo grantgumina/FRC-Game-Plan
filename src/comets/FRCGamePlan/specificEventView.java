@@ -13,6 +13,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -29,7 +30,6 @@ public class specificEventView extends Activity {
 
 	private ProgressDialog progressDialog;
 	private Handler handler = new Handler() {
-
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
@@ -46,20 +46,44 @@ public class specificEventView extends Activity {
 		matchesListView.setOnItemClickListener(new OnItemClickListener() {
 			@SuppressWarnings("unused")
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				for (int i = 0; i < listData.length; i++) {
-					matchIntent = new Intent(specificEventView.this,
-							matchView.class);
-					matchIntent.putExtra("md", listData[i]);
-					startActivity(matchIntent);
-					break;
-				}
+			public void onItemClick(AdapterView<?> arg0, View v, int itemIndex,
+					long l) {
+				Bundle extras = getIntent().getExtras();
+				matchIntent = new Intent(specificEventView.this,
+						matchView.class);
+				matchIntent.putExtra("md", listData[itemIndex]);
+				Log.d("", "" + itemIndex);
+				matchIntent.putExtra("eventShortName", extras.getString("eventShortName"));
+				startActivity(matchIntent);
 
 			}
 		});
 
 		processThread();
+	}
+	
+
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case R.id.selectEvent: {
+			return true;
+		}
+		case R.id.selectMatch: {
+			return true;
+		}
+		case R.id.selectTeam: {
+			return true;
+		}
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	private void processThread() {
@@ -103,11 +127,5 @@ public class specificEventView extends Activity {
 		}
 
 		return temp;
-	}
-
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
-		return true;
 	}
 }
